@@ -1,12 +1,11 @@
 package com.example.nutricionapp.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -14,89 +13,86 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.nutricionapp.R
-
-// --- 🔽 AQUÍ ESTÁ LA CORRECCIÓN 🔽 ---
-// Movimos los colores aquí para que sean visibles por todas las funciones del archivo
-private val GreenPrimary = Color(0xFF7FB972)
-private val GreenPrimaryDark = Color(0xFF4F7D49)
-private val GreenContainer = Color(0xFFDFF1DA)
-
+import androidx.compose.ui.unit.sp
+import com.example.nutricionapp.data.NutricionRepository
+import com.example.nutricionapp.data.model.ActividadFisica
+import com.example.nutricionapp.ui.components.ChatFab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActividadFisicaScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onChat: () -> Unit
 ) {
-    // Los colores ya no se definen aquí, usan los de arriba
+    // 👇 Fondo corregido
+    val BgColor = Color(0xFFE8EBE9)
+    val GreenGradient = listOf(Color(0xFF7FB972), Color(0xFF4F7D49))
+    val IconBgColor = Color(0xFFE1F5FE)
+    val BeneficiosBgColor = Color(0xFFE8F5E9)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val actividades = NutricionRepository.obtenerActividadesFisicas()
 
-        Image(
-            painter = painterResource(id = R.drawable.bg_actividad),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White.copy(alpha = 0.6f))
-        )
-
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.Transparent
-        ) {
-            Column(
+    Scaffold(
+        containerColor = BgColor,
+        floatingActionButton = { ChatFab(onClick = onChat) },
+        topBar = {
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
+                    .background(Brush.verticalGradient(GreenGradient))
             ) {
-
-                // Top bar
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                    IconButton(
+                        onClick = onBack,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f),
+                            contentColor = Color.White
                         )
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "Actividad física",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                        text = "Actividad Física",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 28.sp
+                        )
+                    )
+                    Text(
+                        text = "¡A moverse! 60 minutos al día",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                     )
                 }
-
-                Text(
-                    text = "Los niños deben realizar al menos 60 minutos de actividad física moderada al día. Al menos 3 de esos días, la actividad debería ser vigorosa.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-                )
-
-                // Card beneficios
+            }
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(22.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = GreenContainer.copy(alpha = 0.85f)
-                    ),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = BeneficiosBgColor),
+                    elevation = CardDefaults.cardElevation(0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -104,73 +100,28 @@ fun ActividadFisicaScreen(
                     ) {
                         Text(
                             text = "Beneficios del movimiento diario",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            color = GreenPrimaryDark
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
                         )
                         Text(
-                            text = "• Mejora el ánimo, la concentración y el rendimiento escolar.\n" +
-                                    "• Fortalece huesos y músculos.\n" +
-                                    "• Protege el corazón y los pulmones.\n" +
-                                    "• Ayuda a mantener un peso saludable.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.95f)
+                            text = "• Mejora el ánimo y la concentración.\n• Fortalece huesos y músculos.\n• Protege el corazón.",
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF1B5E20))
                         )
                     }
                 }
+            }
 
-                // Tarjetas de tipos de actividad
-                ActividadCard(
-                    emoji = "🏃‍♀️",
-                    titulo = "Juegos de resistencia",
-                    detalle = "Fútbol, básquetbol, vóleibol, correr, andar en bicicleta, skate o patines.",
-                    porque = "Ayudan a que el corazón y los pulmones sean más fuertes y a que tu hijo tenga más energía para el día a día.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
+            items(actividades) { actividad ->
+                ActividadCardModern(actividad, IconBgColor)
+            }
 
-                ActividadCard(
-                    emoji = "🧗‍♂️",
-                    titulo = "Juegos de fuerza",
-                    detalle = "Trepar, colgarse de las barras, escalar, empujar o tirar cuerdas, juegos de arrastre.",
-                    porque = "Favorecen el desarrollo de músculos y huesos fuertes, fundamentales en la etapa de crecimiento.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                ActividadCard(
-                    emoji = "🤸‍♂️",
-                    titulo = "Juegos de equilibrio y coordinación",
-                    detalle = "Saltar en un pie, la cuerda, circuitos con conos, caminar por líneas marcadas en el piso.",
-                    porque = "Mejoran la coordinación, el equilibrio y la seguridad al moverse.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                Text(
-                    text = "Ideas para familias:",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = GreenPrimaryDark
-                )
-
-                BulletText("Salir a caminar en familia después de la comida principal, aunque sean 20–30 minutos.")
-                BulletText("Promover juegos activos los fines de semana: plaza, bicicleta, pelota, rayuela, etc.")
-                BulletText("Incentivar la participación en talleres deportivos del colegio o la comunidad.")
-                BulletText("Asignar pequeñas tareas domésticas que impliquen movimiento (ordenar juguetes, ayudar a regar, barrer espacios pequeños).")
-
+            item {
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Text(
-                    text = "Recuerda: la actividad física, junto a una alimentación equilibrada y un buen descanso, es la base de una vida saludable y activa.",
+                    text = "Incentiva juegos activos y salidas al aire libre en familia.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                    textAlign = TextAlign.Start
+                    color = Color.Gray,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -178,83 +129,50 @@ fun ActividadFisicaScreen(
 }
 
 @Composable
-private fun ActividadCard(
-    emoji: String,
-    titulo: String,
-    detalle: String,
-    porque: String,
-    greenPrimary: Color,
-    greenPrimaryDark: Color,
-    greenContainer: Color
+private fun ActividadCardModern(
+    actividad: ActividadFisica,
+    iconBgColor: Color
 ) {
+    val emoji = when {
+        actividad.nombre.contains("fuerza", ignoreCase = true) -> "🧗‍♂️"
+        actividad.nombre.contains("resistencia", ignoreCase = true) -> "🏃‍♀️"
+        else -> "🤸‍♂️"
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = GreenContainer.copy(alpha = 0.85f)
-        ),
-        elevation = CardDefaults.cardElevation(3.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.Top
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(greenPrimary.copy(alpha = 0.18f)),
+                    .size(50.dp)
+                    .background(iconBgColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = emoji, style = MaterialTheme.typography.titleLarge)
+                Text(text = emoji, fontSize = 24.sp)
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = titulo,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    text = actividad.nombre,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    text = detalle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.95f)
+                    text = actividad.ejemplos.joinToString(", "),
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "¿Por qué es importante?",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = greenPrimaryDark
-                )
-                Text(
-                    text = porque,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                    text = actividad.beneficio,
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
                 )
             }
         }
-    }
-}
-
-// Esta es la función que daba error. Ahora puede ver "GreenContainer"
-// O podemos usar la versión de "ColacionesScreen" que es más segura.
-// Dejemos la versión segura que no depende de los colores locales.
-@Composable
-private fun BulletText(text: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Text("•", style = MaterialTheme.typography.bodySmall)
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-        )
     }
 }

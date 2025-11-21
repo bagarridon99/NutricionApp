@@ -1,12 +1,11 @@
 package com.example.nutricionapp.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -14,136 +13,90 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.nutricionapp.R
+import androidx.compose.ui.unit.sp
+import com.example.nutricionapp.data.NutricionRepository
+import com.example.nutricionapp.data.model.Colacion
+import com.example.nutricionapp.ui.components.ChatFab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ColacionesScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onChat: () -> Unit
 ) {
-    val GreenPrimary = Color(0xFF7FB972)
-    val GreenPrimaryDark = Color(0xFF4F7D49)
-    val GreenContainer = Color(0xFFDFF1DA)
+    // 👇 Fondo corregido
+    val BgColor = Color(0xFFE8EBE9)
+    val GreenGradient = listOf(Color(0xFF7FB972), Color(0xFF4F7D49))
+    val IconBgColor = Color(0xFFFFF3E0)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val colaciones = NutricionRepository.obtenerColaciones()
 
-        Image(
-            painter = painterResource(id = R.drawable.bg_colaciones),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White.copy(alpha = 0.6f))
-        )
-
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.Transparent
-        ) {
-            Column(
+    Scaffold(
+        containerColor = BgColor,
+        floatingActionButton = { ChatFab(onClick = onChat) },
+        topBar = {
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
+                    .background(Brush.verticalGradient(GreenGradient))
             ) {
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                    IconButton(
+                        onClick = onBack,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f),
+                            contentColor = Color.White
                         )
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "Colaciones saludables",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                        text = "Colaciones Saludables",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 28.sp
+                        )
+                    )
+                    Text(
+                        text = "Ideas fáciles y nutritivas para la lonchera",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                     )
                 }
-
-                Text(
-                    text = "Ideas de colaciones fáciles, rápidas y económicas para la lonchera, junto a explicaciones sencillas para reforzar la educación nutricional.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
-                )
-
-                ColacionCard(
-                    emoji = "🥣",
-                    titulo = "Yogurt + fruta",
-                    detalle = "1 yogurt (100–150 cc) + 1 fruta a elección de tu hijo.",
-                    porque = "El yogurt aporta proteína y calcio para los huesos; la fruta aporta fibra y vitaminas. Juntos ayudan a mantener la energía y la saciedad.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                ColacionCard(
-                    emoji = "🥕",
-                    titulo = "Palitos de verdura + huevo duro / hummus",
-                    detalle = "1 vaso de palitos de zanahoria, pepino o apio + 1 huevo duro o 2 cucharadas de hummus.",
-                    porque = "Las verduras crujientes ayudan a la saciedad y entregan fibra; el huevo o el hummus aportan proteína para el crecimiento.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                ColacionCard(
-                    emoji = "🥜",
-                    titulo = "Frutos secos + fruta",
-                    detalle = "1 puñado pequeño de frutos secos sin sal (almendras, maní, nueces) + 1 fruta.",
-                    porque = "Los frutos secos entregan grasas saludables para el cerebro; la fruta aporta energía y fibra. Es una colación que mantiene la energía por más tiempo.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                ColacionCard(
-                    emoji = "🥖",
-                    titulo = "Media marraqueta con agregado",
-                    detalle = "1/2 marraqueta con agregado a elección. Prioriza quesillo, queso fresco, palta, tomate o huevo. Evita embutidos como mortadela, salchichas o jamón laminado.",
-                    porque = "El pan entrega energía; si se acompaña con lácteos o verduras, sumas proteína, calcio y vitaminas. Evitar embutidos ayuda a cuidar el corazón y la presión arterial.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "Tips prácticos:",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = GreenPrimaryDark
-                )
-
-                BulletText("Incluye siempre agua como bebida principal, evitando jugos en caja y bebidas azucaradas.")
-                BulletText("Prefiere colaciones que combinen fruta o verdura con una fuente de proteína o grasas saludables.")
-                BulletText("Deja a tu hijo elegir entre 2–3 opciones saludables para que participe en su propia alimentación.")
-
+            }
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(colaciones) { colacion ->
+                ColacionCardModern(colacion, IconBgColor)
+            }
+            item {
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Text(
-                    text = "Recuerda: la colación es un complemento, no debe reemplazar el desayuno ni el almuerzo.",
+                    text = "Recuerda: la colación es un complemento, no reemplaza comidas principales.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                    textAlign = TextAlign.Start
+                    color = Color.Gray,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -151,80 +104,52 @@ fun ColacionesScreen(
 }
 
 @Composable
-private fun ColacionCard(
-    emoji: String,
-    titulo: String,
-    detalle: String,
-    porque: String,
-    greenPrimary: Color,
-    greenPrimaryDark: Color,
-    greenContainer: Color
+private fun ColacionCardModern(
+    colacion: Colacion,
+    iconBgColor: Color
 ) {
+    val emoji = when {
+        colacion.nombre.contains("Yogurt") -> "🥣"
+        colacion.nombre.contains("verdura") -> "🥕"
+        colacion.nombre.contains("Frutos secos") -> "🥜"
+        colacion.nombre.contains("marraqueta") -> "🥖"
+        else -> "🍎"
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = greenContainer.copy(alpha = 0.85f)
-        ),
-        elevation = CardDefaults.cardElevation(3.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.Top
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(greenPrimary.copy(alpha = 0.18f)),
+                    .size(50.dp)
+                    .background(iconBgColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = emoji, style = MaterialTheme.typography.titleLarge)
+                Text(text = emoji, fontSize = 24.sp)
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = titulo,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    text = colacion.nombre,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    text = detalle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.95f)
+                    text = colacion.detalle,
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "¿Por qué es saludable?",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = greenPrimaryDark
-                )
-                Text(
-                    text = porque,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                    text = colacion.beneficio,
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun BulletText(text: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.Top
-    ) {
-        Text("•", style = MaterialTheme.typography.bodySmall)
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-        )
     }
 }

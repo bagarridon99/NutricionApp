@@ -1,12 +1,11 @@
 package com.example.nutricionapp.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -14,127 +13,118 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.nutricionapp.R
+import androidx.compose.ui.unit.sp
+import com.example.nutricionapp.data.NutricionRepository
+import com.example.nutricionapp.data.model.Consejo
+import com.example.nutricionapp.ui.components.ChatFab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SuenoScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onChat: () -> Unit
 ) {
-    val GreenPrimary = Color(0xFF7FB972)
-    val GreenPrimaryDark = Color(0xFF4F7D49)
-    val GreenContainer = Color(0xFFDFF1DA)
+    // 👇 Fondo corregido
+    val BgColor = Color(0xFFE8EBE9)
+    val GreenGradient = listOf(Color(0xFF7FB972), Color(0xFF4F7D49))
+    val IconBgColor = Color(0xFFF3E5F5)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val consejosSueno = NutricionRepository.obtenerConsejosSueno()
 
-        Image(
-            painter = painterResource(id = R.drawable.bg_sueno),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White.copy(alpha = 0.6f))
-        )
-
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.Transparent
-        ) {
-            Column(
+    Scaffold(
+        containerColor = BgColor,
+        floatingActionButton = { ChatFab(onClick = onChat) },
+        topBar = {
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp))
+                    .background(Brush.verticalGradient(GreenGradient))
             ) {
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver"
+                    IconButton(
+                        onClick = onBack,
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f),
+                            contentColor = Color.White
                         )
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "Sueño y descanso",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
+                        text = "Sueño y Descanso",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 28.sp
+                        )
+                    )
+                    Text(
+                        text = "Clave para el crecimiento y el aprendizaje",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = Color.White.copy(alpha = 0.9f)
                         )
                     )
                 }
+            }
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)), // Azul muy claro
+                    elevation = CardDefaults.cardElevation(0.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(text = "🕘", fontSize = 32.sp)
+                        Column {
+                            Text(
+                                text = "Horas recomendadas",
+                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = Color(0xFF1565C0))
+                            )
+                            Text(
+                                text = "Entre 9 y 11 horas por noche para escolares.",
+                                style = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF0D47A1))
+                            )
+                        }
+                    }
+                }
+            }
 
-                Text(
-                    text = "El sueño es clave para el crecimiento, el aprendizaje y el buen ánimo. Los niños en edad escolar idealmente deberían dormir entre 9 y 11 horas por noche.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
-                )
+            items(consejosSueno) { consejo ->
+                SuenoCardModern(consejo, IconBgColor)
+            }
 
-                SuenoCard(
-                    emoji = "🕘",
-                    titulo = "Horario recomendado",
-                    detalle = "Idealmente dormirse alrededor de las 21:00 para alcanzar entre 9 y 11 horas de sueño, dependiendo de la hora en que debe despertar.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                SuenoCard(
-                    emoji = "📵",
-                    titulo = "Antes de dormir",
-                    detalle = "Evitar pantallas (celular, tablet, TV) al menos 1 hora antes de dormir. La luz de las pantallas puede dificultar conciliar el sueño.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                SuenoCard(
-                    emoji = "🌙",
-                    titulo = "Ambiente ideal",
-                    detalle = "La habitación debe estar lo más oscura posible, con poco ruido y temperatura agradable. Evitar juguetes muy estimulantes sobre la cama.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                SuenoCard(
-                    emoji = "☕",
-                    titulo = "Bebidas y alimentos estimulantes",
-                    detalle = "Evitar café, bebidas azucaradas, energéticas y grandes cantidades de chocolate en la tarde-noche. También es mejor evitar comidas muy pesadas justo antes de dormir.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
-                SuenoCard(
-                    emoji = "📚",
-                    titulo = "Rutina familiar",
-                    detalle = "Crear una rutina tranquila antes de dormir: higiene (baño, dientes), dejar la mochila y ropa lista, leer un cuento o conversar brevemente sobre el día.",
-                    greenPrimary = GreenPrimary,
-                    greenPrimaryDark = GreenPrimaryDark,
-                    greenContainer = GreenContainer
-                )
-
+            item {
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Text(
-                    text = "Un buen descanso, junto a la actividad física diaria y una alimentación equilibrada, ayuda a que tu hijo tenga mejor ánimo, concentración y rendimiento escolar.",
+                    text = "Una rutina constante antes de dormir ayuda a conciliar el sueño.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f),
-                    textAlign = TextAlign.Start
+                    color = Color.Gray,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -142,49 +132,46 @@ fun SuenoScreen(
 }
 
 @Composable
-private fun SuenoCard(
-    emoji: String,
-    titulo: String,
-    detalle: String,
-    greenPrimary: Color,
-    greenPrimaryDark: Color,
-    greenContainer: Color
+private fun SuenoCardModern(
+    consejo: Consejo,
+    iconBgColor: Color
 ) {
+    val emoji = when {
+        consejo.titulo.contains("pantallas") -> "📵"
+        consejo.titulo.contains("Ambiente") -> "🌙"
+        consejo.titulo.contains("estimulantes") -> "☕"
+        consejo.titulo.contains("Rutina") -> "📚"
+        else -> "💡"
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = greenContainer.copy(alpha = 0.85f)
-        ),
-        elevation = CardDefaults.cardElevation(3.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.Top
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(greenPrimary.copy(alpha = 0.18f)),
+                    .size(50.dp)
+                    .background(iconBgColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = emoji, style = MaterialTheme.typography.titleLarge)
+                Text(text = emoji, fontSize = 24.sp)
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = titulo,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    text = consejo.titulo,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    text = detalle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.95f)
+                    text = consejo.descripcion,
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
                 )
             }
         }
